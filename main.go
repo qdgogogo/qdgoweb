@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/driver/mysql"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
@@ -20,9 +19,7 @@ type User struct {
 func  main()  {
 		db := InitDB()
 		//defer db.Close 可能最新版的gorm 不需要关闭了
-		if err != nil {
-			panic("failed to connect database")
-		}
+
 		r := gin.Default()
 		r.POST("/api/auth/register", func(ctx *gin.Context) {
 			// 获取参数
@@ -41,6 +38,11 @@ func  main()  {
 			}
 			if len(name) == 0{
 				name = RandomString(6)
+			}
+			// 判断手机号是否为空
+			if isTelephoneExist(db, telephone){
+				ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code":422 ,"msg":"用户已经存在"})
+				return
 			}
 
 			// 注册用户
@@ -74,9 +76,9 @@ func InitDB() *gorm.DB {
 	port := "3306"
 	database := "qdgoweb"
 	username := "root"
-	password := "root"
- 	charset := "utf-8"
-	args := fmt.Sprintf("%s:%s@tcp(%s:%s)%s?charset=%s&parseTime=true&loc=Local",
+	password := "564950620"
+ 	charset := "utf8"
+	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true&loc=Local",
 		username,
 		password,
 		host,
